@@ -1,0 +1,171 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using UserPoolingApi.Ef;
+using UserPoolingApi.Models;
+using UserPoolingApi.ViewModels;
+
+namespace UserPoolingApi.Controllers
+{
+    [Produces("application/json")]
+    [Route("User")]
+    public class UserController : Controller
+    {
+        private readonly DataContext _context;
+        private readonly IMapper _map;
+
+        public UserController(DataContext context, IMapper map)
+        {
+            _context = context;
+            _map = map;
+        }
+
+        [HttpGet]
+        public IActionResult GetAllUsers()
+        {
+            return Ok(_map.Map<IEnumerable<DisplayUserViewModel>>(_context.Users.Include("UserSkills").Include("UserSkills.Skill")));
+        }
+
+        [HttpGet]
+        [Route("DownloadFile")]
+        public async Task<IActionResult> DLFile(int UserId)
+        {
+            var user = _context.Users.Find(UserId);
+            string fileName = user.Filename;
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "UploadFiles", UserId.ToString(), fileName);
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, GetContentType(path), Path.GetFileName(path));
+        }
+
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types[ext];
+        }
+
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformats officedocument.spreadsheetml.sheet"},
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"}
+            };
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetUserById(int id)
+        {
+            var user = _context.Users.Include("UserSkills").Include("UserSkills.Skill").FirstOrDefault(u => u.UserId == id);
+
+            if (user == null)
+            {
+                return NotFound("User with Id " + id + " is not found");
+            }
+
+            return Ok(_map.Map<DisplayUserViewModel>(user));
+        }
+
+        [HttpPost]
+        public IActionResult Create(UserViewModel userVM)
+        {
+            try
+            {
+                var a = userVM.Filename.Name;
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                var is_email_exist = _context.Users.Any(u => u.Email == userVM.Email);
+
+                if (is_email_exist)
+                {
+                    return StatusCode(409);
+                }
+                var user = _map.Map<User>(userVM);
+                _context.Add(user);
+                _context.SaveChanges();
+
+                // save skill
+                if(userVM.Skills != null)
+                {
+                    string[] skillId = null;
+                    skillId = userVM.Skills.Split(",");
+                    for (int i = 0; i < skillId.Length; i++)
+                    {
+                        UserSkillViewModel userskillVM = new UserSkillViewModel();
+                        userskillVM.UserId = user.UserId;
+                        userskillVM.SkillId = int.Parse(skillId[i]);
+                        _context.Add(_map.Map<UserSkills>(userskillVM));                        
+                    }
+                    _context.SaveChanges();
+                }
+
+                // will create folder where it stored the uploaded file.
+                if (userVM.Filename == null || userVM.Filename.Length == 0)
+                    return Content("file not selected");
+
+                var path = Path.Combine("C:\\UploadFiles",
+                            user.UserId.ToString(), userVM.Filename.FileName);
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    userVM.Filename.CopyTo(stream);
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == id);
+
+                if(user == null)
+                {
+                    return NotFound("User with ID " + id + " is not found." );
+                }
+
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                return new NoContentResult();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        
+    }
+}

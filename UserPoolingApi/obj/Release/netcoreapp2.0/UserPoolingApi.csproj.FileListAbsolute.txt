@@ -1,0 +1,12 @@
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\bin\Release\netcoreapp2.0\UserPoolingApi.deps.json
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\bin\Release\netcoreapp2.0\UserPoolingApi.runtimeconfig.json
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\bin\Release\netcoreapp2.0\UserPoolingApi.runtimeconfig.dev.json
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\bin\Release\netcoreapp2.0\UserPoolingApi.dll
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\bin\Release\netcoreapp2.0\UserPoolingApi.pdb
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\obj\Release\netcoreapp2.0\UserPoolingApi.csproj.CoreCompileInputs.cache
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\obj\Release\netcoreapp2.0\UserPoolingApi.AssemblyInfoInputs.cache
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\obj\Release\netcoreapp2.0\UserPoolingApi.AssemblyInfo.cs
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\obj\Release\netcoreapp2.0\UserPoolingApi.dll
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\obj\Release\netcoreapp2.0\UserPoolingApi.pdb
+C:\Users\devt\documents\visual studio 2017\Projects\PoolingSystem\UserPoolingApi\obj\Release\netcoreapp2.0\UserPoolingApi.csprojResolveAssemblyReference.cache
+C:\Users\devt\Documents\Visual Studio 2017\Projects\PoolingSystem\UserPoolingApi\bin\Release\netcoreapp2.0\HtmlTemplate\EmailTemplate.html
